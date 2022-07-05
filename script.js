@@ -29,6 +29,7 @@ function populateElementButtons(padValues, element) {
     padValues.forEach((value) => {
         let button = document.createElement("button");
         button.textContent = value;
+        button.id = "id-" + value;  
         element.appendChild(button);
     })
 }
