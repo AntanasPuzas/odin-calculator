@@ -47,29 +47,41 @@ const display = document.querySelector("#display");
 function populateNumberEventListeners(buttons) {
     buttons.forEach((button) => {
         button.addEventListener("click", () => {
-            if (button.id === "id-." && currentDisplay.includes(".")) {
+            if (button.id === "id-." && currentValue.includes(".")) {
             } else {
-                currentDisplay += button.textContent;
-                display.textContent = currentDisplay;
+                currentValue += button.textContent;
+                display.textContent = currentValue;
             }
         });
     });
 }
 
+function populateNumberEventListenersKeyboard() {
+    document.addEventListener("keydown", (event) => {
+        const keyName = event.key;
+        if (keyName === "." && currentValue.includes(".")) {
+        } else if (/([0-9]|\.)/g.test(keyName)) {
+            currentValue += keyName;
+            display.textContent = currentValue;
+        }
+    })
+}
+
 const numberButtons = [...keypadNumbers.childNodes]
     .filter(button => /id-([0-9]|\.)/g.test(button.id));
 
-let previousDisplay = "";
-let currentDisplay = "";
+let previousValue = "";
+let currentValue = "";
 let operator = "";
-let operatorNext = "";
+// let operatorNext = "";
 
 populateNumberEventListeners(numberButtons);
+populateNumberEventListenersKeyboard();
 
 // Clear button event listener
 document.querySelector("#clear").addEventListener("click", () => {
-    currentDisplay = "";
-    previousDisplay = "";
+    currentValue = "";
+    previousValue = "";
     operator = "";
     operatorNext = "";
     display.textContent = "";
@@ -77,38 +89,76 @@ document.querySelector("#clear").addEventListener("click", () => {
 
 // Delete button event listener
 document.querySelector("#delete").addEventListener("click", () => {
-    currentDisplay = currentDisplay.slice(0, currentDisplay.length - 1);
+    currentValue = currentValue.slice(0, currentValue.length - 1);
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
 })
+
+function operatorEvent(eventOperator) {
+    // operatorNext = eventOperator;
+    // if (previousValue === "") {
+    //     previousValue = currentValue;
+    //     currentValue = "";
+    //     operator = operatorNext;
+    // } else {
+    //     //If no new input is given, repeat previous operation
+    //     console.log("Operator: " + operator);
+    //     console.log("OperatorNext: " + operatorNext);
+    //     if (operator === "=") {
+    //         operator = operatorNext;
+    //         console.log(operator);
+    //     } else if (currentValue === "") {
+    //         currentValue = operate(operator,
+    //             parseFloat(previousValue), parseFloat(previousValue));
+    //     } else {
+    //         currentValue = operate(operator,
+    //             parseFloat(previousValue), parseFloat(currentValue));
+    //     }
+    //     // currentValue = operate(operator,
+    //     //     parseFloat(previousValue), parseFloat(currentValue));
+    //     display.textContent = currentValue;
+    //     previousValue = currentValue;
+    //     currentValue = "";
+    //     operator = operatorNext;
+    // }
+    operator = eventOperator;
+    if (previousValue === "") {
+        previousValue = currentValue;
+        currentValue = "";
+    } else {
+        currentValue = operate(operator, parseFloat(previousValue), parseFloat(currentValue));
+        display.textContent = currentValue;
+        previousValue = currentValue;
+        currentValue = "";
+    }
+}
 
 function populateOperatorEventListeners(operatorButtons) {
     operatorButtons.forEach((button) => {
         button.addEventListener("click", () => {
-            operatorNext = button.textContent;
-            if (previousDisplay === "") {
-                previousDisplay = currentDisplay;
-                currentDisplay = "";
-                operator = operatorNext;
-            } else {
-                if (currentDisplay === "") {
-                    currentDisplay = operate(operator,
-                        parseFloat(previousDisplay), parseFloat(previousDisplay));
-                } else {
-                    currentDisplay = operate(operator,
-                        parseFloat(previousDisplay), parseFloat(currentDisplay));
-                }
-                display.textContent = currentDisplay;
-                previousDisplay = currentDisplay;
-                currentDisplay = "";
-                operator = operatorNext;
-            }
+            operatorEvent(button.textContent);
         })
+    })
+}
+
+function populateOperatorEventListenersKeyboard() {
+    document.addEventListener("keydown", (event) => {
+        const keyName = event.key;
+        if (/(\+|\-|\*|\/)/g.test(keyName)) {
+            operatorEvent(keyName);
+        }
     })
 }
 
 const operatorButtons = [...keypadOperators.childNodes];
 populateOperatorEventListeners(operatorButtons);
+populateOperatorEventListenersKeyboard();
 
+// = button event listener
 document.querySelector("#id-\\=").addEventListener("click", () => {
-    display.textContent = operate(operator, parseFloat(previousDisplay), parseFloat(currentDisplay));
+    if (currentValue !== "") {
+        currentValue = operate(operator, parseFloat(previousValue), parseFloat(currentValue))
+        display.textContent = currentValue;
+        previousValue = currentValue;
+        currentValue = "";
+    }
 })
