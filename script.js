@@ -73,7 +73,8 @@ const numberButtons = [...keypadNumbers.childNodes]
 let previousValue = "";
 let currentValue = "";
 let operator = "";
-// let operatorNext = "";
+let operatorNext = "";
+let previousOperator = "";
 
 populateNumberEventListeners(numberButtons);
 populateNumberEventListenersKeyboard();
@@ -84,6 +85,7 @@ document.querySelector("#clear").addEventListener("click", () => {
     previousValue = "";
     operator = "";
     operatorNext = "";
+    previousOperator = "";
     display.textContent = "";
 })
 
@@ -94,41 +96,24 @@ document.querySelector("#delete").addEventListener("click", () => {
 })
 
 function operatorEvent(eventOperator) {
-    // operatorNext = eventOperator;
-    // if (previousValue === "") {
-    //     previousValue = currentValue;
-    //     currentValue = "";
-    //     operator = operatorNext;
-    // } else {
-    //     //If no new input is given, repeat previous operation
-    //     console.log("Operator: " + operator);
-    //     console.log("OperatorNext: " + operatorNext);
-    //     if (operator === "=") {
-    //         operator = operatorNext;
-    //         console.log(operator);
-    //     } else if (currentValue === "") {
-    //         currentValue = operate(operator,
-    //             parseFloat(previousValue), parseFloat(previousValue));
-    //     } else {
-    //         currentValue = operate(operator,
-    //             parseFloat(previousValue), parseFloat(currentValue));
-    //     }
-    //     // currentValue = operate(operator,
-    //     //     parseFloat(previousValue), parseFloat(currentValue));
-    //     display.textContent = currentValue;
-    //     previousValue = currentValue;
-    //     currentValue = "";
-    //     operator = operatorNext;
-    // }
-    operator = eventOperator;
-    if (previousValue === "") {
+    operatorNext = eventOperator;
+    console.log("Operator: " + operator);
+    console.log("OperatorNext: " + operatorNext);
+    if (previousOperator === "=") {
+        previousOperator = "";
+        currentValue = "";
+        operator = operatorNext;
+    } else if (previousValue === "") {
         previousValue = currentValue;
         currentValue = "";
-    } else {
-        currentValue = operate(operator, parseFloat(previousValue), parseFloat(currentValue));
+        operator = operatorNext;
+    } else if (currentValue !== "") {
+        currentValue = operate(operator,
+            parseFloat(previousValue), parseFloat(currentValue));
         display.textContent = currentValue;
         previousValue = currentValue;
         currentValue = "";
+        operator = operatorNext;
     }
 }
 
@@ -155,10 +140,10 @@ populateOperatorEventListenersKeyboard();
 
 // = button event listener
 document.querySelector("#id-\\=").addEventListener("click", () => {
-    if (currentValue !== "") {
-        currentValue = operate(operator, parseFloat(previousValue), parseFloat(currentValue))
+    if (currentValue !== "" && previousValue !== "" && previousOperator !== "=") {
+        currentValue = operate(operatorNext, parseFloat(previousValue), parseFloat(currentValue))
         display.textContent = currentValue;
         previousValue = currentValue;
-        currentValue = "";
+        previousOperator = "=";
     }
 })
