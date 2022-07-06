@@ -56,17 +56,6 @@ function populateNumberEventListeners(buttons) {
     });
 }
 
-function populateNumberEventListenersKeyboard() {
-    document.addEventListener("keydown", (event) => {
-        const keyName = event.key;
-        if (keyName === "." && currentValue.includes(".")) {
-        } else if (/([0-9]|\.)/g.test(keyName)) {
-            currentValue += keyName;
-            display.textContent = currentValue;
-        }
-    })
-}
-
 const numberButtons = [...keypadNumbers.childNodes]
     .filter(button => /id-([0-9]|\.)/g.test(button.id));
 
@@ -77,23 +66,26 @@ let operatorNext = "";
 let previousOperator = "";
 
 populateNumberEventListeners(numberButtons);
-populateNumberEventListenersKeyboard();
 
 // Clear button event listener
-document.querySelector("#clear").addEventListener("click", () => {
+document.querySelector("#clear").addEventListener("click", () => clearEvent());
+
+function clearEvent() {
     currentValue = "";
     previousValue = "";
     operator = "";
     operatorNext = "";
     previousOperator = "";
     display.textContent = "";
-})
+}
 
 // Delete button event listener
-document.querySelector("#delete").addEventListener("click", () => {
+document.querySelector("#delete").addEventListener("click", () => deleteEvent())
+
+function deleteEvent() {
     currentValue = currentValue.slice(0, currentValue.length - 1);
     display.textContent = display.textContent.slice(0, display.textContent.length - 1);
-})
+}
 
 function operatorEvent(eventOperator) {
     operatorNext = eventOperator;
@@ -125,25 +117,46 @@ function populateOperatorEventListeners(operatorButtons) {
     })
 }
 
-function populateOperatorEventListenersKeyboard() {
+function populateEventListenersKeyboard() {
     document.addEventListener("keydown", (event) => {
         const keyName = event.key;
+        console.log(keyName);
         if (/(\+|\-|\*|\/)/g.test(keyName)) {
             operatorEvent(keyName);
+        }
+        if (keyName === "." && currentValue.includes(".")) {
+
+        } else if (/([0-9]|\.)/g.test(keyName)) {
+            currentValue += keyName;
+            display.textContent = currentValue;
+        }
+        if (keyName === "=") {
+            equalsEvent();
+        }
+        if (keyName === "Enter") {
+            equalsEvent();
+        }
+        if (keyName === "Backspace") {
+            deleteEvent();
+        }
+        if (keyName === "c") {
+            clearEvent();
         }
     })
 }
 
 const operatorButtons = [...keypadOperators.childNodes];
 populateOperatorEventListeners(operatorButtons);
-populateOperatorEventListenersKeyboard();
+populateEventListenersKeyboard();
 
 // = button event listener
-document.querySelector("#id-\\=").addEventListener("click", () => {
+document.querySelector("#id-\\=").addEventListener("click", () => equalsEvent());
+
+function equalsEvent() {
     if (currentValue !== "" && previousValue !== "" && previousOperator !== "=") {
         currentValue = operate(operatorNext, parseFloat(previousValue), parseFloat(currentValue))
         display.textContent = currentValue;
         previousValue = currentValue;
         previousOperator = "=";
     }
-})
+}
