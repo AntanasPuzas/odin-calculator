@@ -9,7 +9,7 @@
     display: flex;
     justify-content: space-between;
     gap: 10px;
-    height: 35px;
+    height: 45px;
 }
 
 .display {
@@ -30,7 +30,7 @@
 
 .keypad-numbers {
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     flex-wrap: wrap-reverse;
     justify-content: center;
     width: 154px;

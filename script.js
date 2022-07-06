@@ -4,7 +4,12 @@ function subtract(a, b) { return a - b };
 
 function multiply(a, b) { return a * b };
 
-function divide(a, b) { return a / b };
+function divide(a, b) {
+    if (b === 0) {
+        return "Self-destruct in 3..2..1.."
+    }
+    return a / b
+};
 
 function operate(operator, a, b) {
     switch (operator) {
@@ -56,11 +61,47 @@ const numberButtons = [...keypadNumbers.childNodes]
 
 let previousDisplay = "";
 let currentDisplay = "";
+let operator = "";
+let operatorNext = "";
 
 populateNumberEventListeners(numberButtons);
 
 document.querySelector("#clear").addEventListener("click", () => {
     currentDisplay = "";
     previousDisplay = "";
+    operator = "";
+    operatorNext = "";
     display.textContent = "";
+})
+
+function populateOperatorEventListeners(operatorButtons) {
+    operatorButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            operatorNext = button.textContent;
+            if (previousDisplay === "") {
+                previousDisplay = currentDisplay;
+                currentDisplay = "";
+                operator = operatorNext;
+            } else {
+                if (currentDisplay === "") {
+                    currentDisplay = operate(operator,
+                        parseFloat(previousDisplay), parseFloat(previousDisplay));
+                } else {
+                    currentDisplay = operate(operator,
+                        parseFloat(previousDisplay), parseFloat(currentDisplay));
+                }
+                display.textContent = currentDisplay;
+                previousDisplay = currentDisplay;
+                currentDisplay = "";
+                operator = operatorNext;
+            }
+        })
+    })
+}
+
+const operatorButtons = [...keypadOperators.childNodes];
+populateOperatorEventListeners(operatorButtons);
+
+document.querySelector("#id-\\=").addEventListener("click", () => {
+    display.textContent = operate(operator, parseFloat(previousDisplay), parseFloat(currentDisplay));
 })
