@@ -66,12 +66,19 @@ let operatorNext = "";
 
 populateNumberEventListeners(numberButtons);
 
+// Clear button event listener
 document.querySelector("#clear").addEventListener("click", () => {
     currentDisplay = "";
     previousDisplay = "";
     operator = "";
     operatorNext = "";
     display.textContent = "";
+})
+
+// Delete button event listener
+document.querySelector("#delete").addEventListener("click", () => {
+    currentDisplay = currentDisplay.slice(0, currentDisplay.length - 1);
+    display.textContent = display.textContent.slice(0, display.textContent.length - 1);
 })
 
 function populateOperatorEventListeners(operatorButtons) {
