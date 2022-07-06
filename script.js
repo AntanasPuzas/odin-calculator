@@ -34,21 +34,33 @@ function populateElementButtons(padValues, element) {
     })
 }
 
-function populateEventListeners(buttons) {
+populateElementButtons(numberPad, keypadNumbers);
+populateElementButtons(operatorPad, keypadOperators);
+
+const display = document.querySelector("#display");
+
+function populateNumberEventListeners(buttons) {
     buttons.forEach((button) => {
         button.addEventListener("click", () => {
-            currentDisplay += button.textContent;
+            if (button.id === "id-." && currentDisplay.includes(".")) {
+            } else {
+                currentDisplay += button.textContent;
+                display.textContent = currentDisplay;
+            }
         });
     });
 }
 
-populateElementButtons(numberPad, keypadNumbers);
-populateElementButtons(operatorPad, keypadOperators);
-
 const numberButtons = [...keypadNumbers.childNodes]
-    .filter(button => /id-[0-9]/g.test(button.id));
+    .filter(button => /id-([0-9]|\.)/g.test(button.id));
 
 let previousDisplay = "";
 let currentDisplay = "";
 
-populateEventListeners(numberButtons);
+populateNumberEventListeners(numberButtons);
+
+document.querySelector("#clear").addEventListener("click", () => {
+    currentDisplay = "";
+    previousDisplay = "";
+    display.textContent = "";
+})
