@@ -47,7 +47,7 @@ const display = document.querySelector("#display");
 function populateNumberEventListeners(buttons) {
     buttons.forEach((button) => {
         button.addEventListener("click", () => {
-            if (button.id === "id-." && currentValue.includes(".")) {
+            if (button.id === "id-." && currentValue.toString().includes(".")) {
             } else {
                 currentValue += button.textContent;
                 updateDisplay();
@@ -124,7 +124,7 @@ function populateEventListenersKeyboard() {
         if (/(\+|\-|\*|\/)/g.test(keyName)) {
             operatorEvent(keyName);
         }
-        if (keyName === "." && currentValue.includes(".")) {
+        if (keyName === "." && currentValue.toString().includes(".")) {
 
         } else if (/^([0-9]|\.)/g.test(keyName)) {
             currentValue += keyName;
