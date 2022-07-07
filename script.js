@@ -50,7 +50,7 @@ function populateNumberEventListeners(buttons) {
             if (button.id === "id-." && currentValue.includes(".")) {
             } else {
                 currentValue += button.textContent;
-                display.textContent = currentValue;
+                updateDisplay();
             }
         });
     });
@@ -63,7 +63,7 @@ let previousValue = "";
 let currentValue = "";
 let operator = "";
 let operatorNext = "";
-let previousOperator = "";
+let previousOperatorWasEquals = false;
 
 populateNumberEventListeners(numberButtons);
 
@@ -75,7 +75,7 @@ function clearEvent() {
     previousValue = "";
     operator = "";
     operatorNext = "";
-    previousOperator = "";
+    previousOperatorWasEquals = false;
     display.textContent = "";
 }
 
@@ -89,10 +89,8 @@ function deleteEvent() {
 
 function operatorEvent(eventOperator) {
     operatorNext = eventOperator;
-    console.log("Operator: " + operator);
-    console.log("OperatorNext: " + operatorNext);
-    if (previousOperator === "=") {
-        previousOperator = "";
+    if (previousOperatorWasEquals) {
+        previousOperatorWasEquals = false;
         currentValue = "";
         operator = operatorNext;
     } else if (previousValue === "") {
@@ -102,7 +100,7 @@ function operatorEvent(eventOperator) {
     } else if (currentValue !== "") {
         currentValue = operate(operator,
             parseFloat(previousValue), parseFloat(currentValue));
-        display.textContent = currentValue;
+        updateDisplay();
         previousValue = currentValue;
         currentValue = "";
         operator = operatorNext;
@@ -117,18 +115,20 @@ function populateOperatorEventListeners(operatorButtons) {
     })
 }
 
+const operatorButtons = [...keypadOperators.childNodes];
+populateOperatorEventListeners(operatorButtons);
+
 function populateEventListenersKeyboard() {
     document.addEventListener("keydown", (event) => {
         const keyName = event.key;
-        console.log(keyName);
         if (/(\+|\-|\*|\/)/g.test(keyName)) {
             operatorEvent(keyName);
         }
         if (keyName === "." && currentValue.includes(".")) {
 
-        } else if (/([0-9]|\.)/g.test(keyName)) {
+        } else if (/^([0-9]|\.)/g.test(keyName)) {
             currentValue += keyName;
-            display.textContent = currentValue;
+            updateDisplay();
         }
         if (keyName === "=") {
             equalsEvent();
@@ -145,18 +145,27 @@ function populateEventListenersKeyboard() {
     })
 }
 
-const operatorButtons = [...keypadOperators.childNodes];
-populateOperatorEventListeners(operatorButtons);
 populateEventListenersKeyboard();
 
 // = button event listener
 document.querySelector("#id-\\=").addEventListener("click", () => equalsEvent());
 
 function equalsEvent() {
-    if (currentValue !== "" && previousValue !== "" && previousOperator !== "=") {
-        currentValue = operate(operatorNext, parseFloat(previousValue), parseFloat(currentValue))
-        display.textContent = currentValue;
+    if (currentValue !== "" && previousValue !== "" && previousOperatorWasEquals !== "=") {
+        currentValue = operate(operatorNext, parseFloat(previousValue), parseFloat(currentValue));
+        if (currentValue.toString().length >= 17) {
+            currentValue = parseFloat(currentValue).toExponential(3);
+            console.log(currentValue);
+        }
+        updateDisplay();
         previousValue = currentValue;
-        previousOperator = "=";
+        previousOperatorWasEquals = true;
     }
+}
+
+function updateDisplay() {
+    if (currentValue.toString().length >= 17) {
+        return;
+    }   
+    display.textContent = currentValue;
 }
